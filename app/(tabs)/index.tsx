@@ -1,10 +1,14 @@
 import { View, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
+import { type ImageSource } from 'expo-image';
+
 import Button from '@/components/button';
 import ImageViewer from '@/components/ImageViewer';
-import CircleButton from '@/components/CircleButton';
 import IconButton from '@/components/IconButton';
+import CircleButton from '@/components/CircleButton';
+import EmojiPicker from '@/components/EmojiPicker';
+import EmojiList from '@/components/EmojiList';
 
 const PlaceholderImage = require('@/assets/images/background-image.png');
 
@@ -13,6 +17,12 @@ export default function Index() {
 		undefined
 	);
 	const [showAppOptions, setShowAppOptions] = useState<boolean>(false);
+	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+	/* @tutinfo Define a state variable. */
+	const [pickedEmoji, setPickedEmoji] = useState<ImageSource | undefined>(
+		undefined
+	);
+
 	const pickImageAsync = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -33,11 +43,15 @@ export default function Index() {
 	};
 
 	const onAddSticker = () => {
-		alert('Add sticker');
+		setIsModalVisible(true);
 	};
 
-	const onSaveImageAsync = () => {
-		alert('Saved Image');
+	const onModalClose = () => {
+		setIsModalVisible(false);
+	};
+
+	const onSaveImageAsync = async () => {
+		// we will implement this later
 	};
 
 	return (
@@ -49,9 +63,9 @@ export default function Index() {
 				/>
 			</View>
 			{showAppOptions ? (
-				<View style={styles.optionContainer}>
-					<View style={styles.optionRow}>
-						<IconButton icon='refresh' label='Refresh' onPress={onReset} />
+				<View style={styles.optionsContainer}>
+					<View style={styles.optionsRow}>
+						<IconButton icon='refresh' label='Reset' onPress={onReset} />
 						<CircleButton onPress={onAddSticker} />
 						<IconButton
 							icon='save-alt'
@@ -73,6 +87,9 @@ export default function Index() {
 					/>
 				</View>
 			)}
+			<EmojiPicker isVisible={isModalVisible} onClose={onModalClose}>
+				<EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
+			</EmojiPicker>
 		</View>
 	);
 }
@@ -90,11 +107,11 @@ const styles = StyleSheet.create({
 		flex: 1 / 3,
 		alignItems: 'center',
 	},
-	optionContainer: {
+	optionsContainer: {
 		position: 'absolute',
 		bottom: 80,
 	},
-	optionRow: {
+	optionsRow: {
 		alignItems: 'center',
 		flexDirection: 'row',
 	},
